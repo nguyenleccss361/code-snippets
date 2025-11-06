@@ -1,36 +1,40 @@
-import { createContext, useContext, useMemo, useState } from 'react'
+import { atom, useAtomValue, useSetAtom } from 'jotai'
+import { atomFamily } from 'jotai/utils'
+import { useMemo } from 'react'
 import { buildClinicalTrialTree } from './clinical-trial-tree'
 import { useFlashOnRender } from './use-flash-on-render'
 
-const CompletedNodeIdsContext = createContext([new Set(), () => {}])
+const completedNodeIdsAtom = atom(new Set())
+const completedCountAtom = atom((get) => {
+  const completedNodeIds = get(completedNodeIdsAtom)
+  return completedNodeIds.size
+})
+const isCompletedAtomFamily = atomFamily((nodeId) => {
+  return atom((get) => {
+    const completedNodeIds = get(completedNodeIdsAtom)
+    return completedNodeIds.has(nodeId)
+  })
+})
 
-export default function Context() {
+export function Jotai() {
   const clinicalTrialTree = useMemo(() => {
     return buildClinicalTrialTree(3, 3)
   }, [])
 
-  const [completedNodeIds, setCompletedNodeIds] = useState(new Set())
-
   return (
     <>
-      <CompletedNodeIdsContext.Provider
-        value={[completedNodeIds, setCompletedNodeIds]}
-      >
-        <h1>Clinical Trial Data Tree</h1>
-        <CompletedCount />
-        {clinicalTrialTree.map((node) => (
-          <Node key={node.id} node={node} />
-        ))}
-      </CompletedNodeIdsContext.Provider>
+      <h1>Clinical Trial Data Tree</h1>
+      <CompletedCount />
+      {clinicalTrialTree.map((node) => (
+        <Node key={node.id} node={node} />
+      ))}
     </>
   )
 }
 
 function CompletedCount() {
   const ref = useFlashOnRender()
-
-  const [completedNodeIds] = useContext(CompletedNodeIdsContext)
-  const completedCount = completedNodeIds.size
+  const completedCount = useAtomValue(completedCountAtom)
 
   return (
     <p ref={ref}>
@@ -42,10 +46,8 @@ function CompletedCount() {
 function Node({ node }) {
   const ref = useFlashOnRender(node)
 
-  const [completedNodeIds, setCompletedNodeIds] = useContext(
-    CompletedNodeIdsContext,
-  )
-  const isCompleted = completedNodeIds.has(node.id)
+  const setCompletedNodeIds = useSetAtom(completedNodeIdsAtom)
+  const isCompleted = useAtomValue(isCompletedAtomFamily(node.id))
 
   return (
     <div key={node.id} ref={ref} style={{ userSelect: 'none' }}>
