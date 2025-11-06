@@ -4,7 +4,7 @@ import { useFlashOnRender } from './use-flash-on-render'
 
 const CompletedNodeIdsContext = createContext([new Set(), () => {}])
 
-export default function ContextDemo() {
+export default function Context() {
   const clinicalTrialTree = useMemo(() => {
     return buildClinicalTrialTree(3, 3)
   }, [])
@@ -26,7 +26,7 @@ export default function ContextDemo() {
   )
 }
 
-export function CompletedCount() {
+function CompletedCount() {
   const ref = useFlashOnRender()
 
   const [completedNodeIds] = useContext(CompletedNodeIdsContext)
@@ -39,7 +39,7 @@ export function CompletedCount() {
   )
 }
 
-export function Node({ node }) {
+function Node({ node }) {
   const ref = useFlashOnRender(node)
 
   const [completedNodeIds, setCompletedNodeIds] = useContext(

@@ -1,5 +1,5 @@
 import './App.css'
-import {useFlashOnRender} from './hooks/use-flash-on-render'
+import {useFlashOnRender} from './perf-jotai/use-flash-on-render'
 // import {Reactivity} from './reactivity/selector'
 
 function App() {
