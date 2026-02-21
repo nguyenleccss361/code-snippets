@@ -19,10 +19,10 @@ function App() {
   return (
     // <Context />
     // <Jotai />
-    // <SplitContext />
+    <SplitContext />
     // <ExternalStore />
     // <SimpleJotai />
-    <VanillaUnoptimized />
+    // <VanillaUnoptimized />
     // <Reactivity />
   );
 }
